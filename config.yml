@@ -1,0 +1,8 @@
+jtype: InstructorEmbeddingExecutor
+py_modules:
+  - executor.py
+metas:
+  name: InstructorEmbeddingExecutor
+  description: InstructorEmbeddingExecutor embeds texts into 768-dim vectors using instructor embedding
+  url: https://github.com/youlc/executor-instructor-embedding
+  keywords: ['text', ' embedding', ' encoding']
