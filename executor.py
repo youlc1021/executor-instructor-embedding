@@ -43,7 +43,7 @@ class InstructorEmbeddingExecutor(Executor):
                 for batch in document_batches_generator:
                     batch.embeddings = self.model.encode(
                         sentences=[[doc.text, j.text] for j in batch],
-                        output_value=parameters.get('output_value',self.output_value),
+                        output_value=parameters.get('output_value',self.output_value[0]),
                         convert_to_numpy=parameters.get('convert_to_numpy',self.convert_to_numpy),
                         convert_to_tensor=parameters.get('convert_to_tensor',self.convert_to_tensor),
                         normalize_embeddings=parameters.get('normalize_embeddings',self.normalize_embeddings))
