@@ -3,7 +3,7 @@ from InstructorEmbedding import INSTRUCTOR
 from typing import Dict
 import torch
 
-class InstructorEmbeddingExecutor1(Executor):
+class InstructorEmbeddingExecutor(Executor):
     """InstructorEmbeddingExecutor embeds texts into 768-dim vectors using instructor embedding"""
     def __init__(
             self,
