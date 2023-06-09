@@ -3,7 +3,7 @@ from InstructorEmbedding import INSTRUCTOR
 from typing import Dict
 import torch
 
-class InstructorEmbeddingExecutor(Executor):
+class InstructorEmbeddingExecutor1(Executor):
     """InstructorEmbeddingExecutor embeds texts into 768-dim vectors using instructor embedding"""
     def __init__(
             self,
@@ -24,26 +24,13 @@ class InstructorEmbeddingExecutor(Executor):
         self.model = INSTRUCTOR(model_name_or_path=model_name, device=device)
 
     @requests
-    def foo(self, docs: DocumentArray, **kwargs):
-        pass
-
-    @requests(on='/')
-    def encode(self, docs: DocumentArray, parameters: Dict = {}, **kwargs):
-        for doc in docs:
-            # doc.text : instruction
-            # doc.matches : sentences
-            document_batches_generator = DocumentArray(
-                filter(
-                    lambda d: d.text,
-                    doc.matches
-                )
-            ).batch(batch_size=parameters.get('batch_size', self.batch_size))
-
+    def encode(self, docs: DocumentArray, parameters: dict, **kwargs):
+        for mini_batch in docs.batch(batch_size=parameters.get('batch_size', self.batch_size)):
+            batch_input = [[d.tags.get('instruction', parameters.get('instruction', '')), d.text] for d in mini_batch if d.text]
             with torch.inference_mode():
-                for batch in document_batches_generator:
-                    batch.embeddings = self.model.encode(
-                        sentences=[[doc.text, j.text] for j in batch],
-                        output_value=parameters.get('output_value',self.output_value[0]),
-                        convert_to_numpy=parameters.get('convert_to_numpy',self.convert_to_numpy),
-                        convert_to_tensor=parameters.get('convert_to_tensor',self.convert_to_tensor),
-                        normalize_embeddings=parameters.get('normalize_embeddings',self.normalize_embeddings))
+                mini_batch.embeddings = self.model.encode(
+                    sentences=batch_input,
+                    output_value=parameters.get('output_value',self.output_value[0]),
+                    convert_to_numpy=parameters.get('convert_to_numpy',self.convert_to_numpy),
+                    convert_to_tensor=parameters.get('convert_to_tensor',self.convert_to_tensor),
+                    normalize_embeddings=parameters.get('normalize_embeddings',self.normalize_embeddings))
