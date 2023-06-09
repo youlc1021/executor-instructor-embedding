@@ -1,6 +1,5 @@
 from jina import DocumentArray, Executor, requests
 from InstructorEmbedding import INSTRUCTOR
-from typing import Dict
 import torch
 
 class InstructorEmbeddingExecutor(Executor):
@@ -10,18 +9,15 @@ class InstructorEmbeddingExecutor(Executor):
             model_name: str = 'hkunlp/instructor-large',
             batch_size: int = 32,
             output_value: str = 'sentence_embedding',
-            convert_to_numpy: bool = True,
-            convert_to_tensor: bool = False,
             normalize_embeddings: bool = False,
             device: str = 'cpu',
             **kwargs):
         super().__init__(**kwargs)
         self.batch_size = batch_size
-        self.output_value = output_value,
-        self.convert_to_numpy = convert_to_numpy,
-        self.convert_to_tensor = convert_to_tensor,
-        self.normalize_embeddings = normalize_embeddings,
+        self.output_value = output_value
+        self.normalize_embeddings = normalize_embeddings
         self.model = INSTRUCTOR(model_name_or_path=model_name, device=device)
+        self.model.eval()
 
     @requests
     def encode(self, docs: DocumentArray, parameters: dict, **kwargs):
@@ -30,7 +26,6 @@ class InstructorEmbeddingExecutor(Executor):
             with torch.inference_mode():
                 mini_batch.embeddings = self.model.encode(
                     sentences=batch_input,
-                    output_value=parameters.get('output_value',self.output_value[0]),
-                    convert_to_numpy=parameters.get('convert_to_numpy',self.convert_to_numpy),
-                    convert_to_tensor=parameters.get('convert_to_tensor',self.convert_to_tensor),
-                    normalize_embeddings=parameters.get('normalize_embeddings',self.normalize_embeddings))
+                    output_value=parameters.get('output_value', self.output_value),
+                    normalize_embeddings=parameters.get('normalize_embeddings', self.normalize_embeddings)
+                )
