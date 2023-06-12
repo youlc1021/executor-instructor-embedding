@@ -29,10 +29,10 @@ parameters = {
 ```
 from docarray import Document, DocumentArray
 from jina import Flow
-from executor import InstructorEmbeddingExecutor
+
 flow = (
     Flow()
-    .add(uses=InstructorEmbeddingExecutor, timeout_ready=-1)
+    .add(uses="jinaai://lc/InstructorEmbeddingExecutor:latest", timeout_ready=-1)
 )
 parameters = {  
         'instruction':'Represent the Science title:',
